@@ -1,4 +1,15 @@
 requirejs.config({
+    //Address any non-amd modules
+    shim: {
+        underscore: {
+          exports: '_'
+        },
+        backbone: {
+          deps: ["underscore", "jquery"],
+          exports: "Backbone"
+        }
+    },
+
     //By default load any module IDs from js/lib
     baseUrl: 'scripts',
 
@@ -9,12 +20,14 @@ requirejs.config({
         main: 'main',
         jquery: "jquery-1.9.0.min", //google ajax call requires a server, so self-host for now
         jquerytypewriter: 'jquery-typewriter/jquerytypewriter',
-        adapt: 'adapt.min.js' //adaptive layout      
+        adapt: 'adapt.min', //adaptive layout
+        underscore: 'underscore',
+        Backbone: 'backbone'
     }
 });
 
 //requiring adapt is failing, possibly because of the not really hosted reason
-require(['jquery', 'jquerytypewriter'], function($, jquerytypewriter){
+require(['jquery','jquerytypewriter','Backbone','underscore'], function($, _, Backbone){
 	$('#story-container h1').typewrite({delay: 20, callback: function(){
 		$('#story-container h2').typewrite({delay: 20, callback: function(){
 			$('#page p').typewrite({delay : 10, callback: function(){
@@ -28,24 +41,6 @@ require(['jquery', 'jquerytypewriter'], function($, jquerytypewriter){
 			$(this).typewrite({delay: 20});
 		});
 	};
-	
-	//Maybe the structure of the page model could look something like this
-	var Page1 = {
-	    text: "Boox walks into a room and sees a giant bee with a saddle on its back",
+    
 
-	    decision : {
-	        prompt: "What should boox do?",
-	        options:
-	            [{
-	                text: "a) Hop on, buddy",
-	                trigger: "a",
-	                effect: 2
-	            },
-	            {
-	                text: "b) Tis an abomination, shoot it",
-	                trigger: "b",
-	                effect: 1
-	            }]
-		}
-	};
 });
