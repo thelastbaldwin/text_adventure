@@ -43,4 +43,20 @@ require(['jquery','jquerytypewriter','Backbone','underscore'], function($, _, Ba
 	};
     
 
+    //Page model
+    var Page = Backbone.Model.extend({
+
+    });
+
+    //Page Collection
+    var Story = Backbone.Collection.extend({
+        model: Page
+    });
+
+    var StoryView = Backbone.View.extend({
+        el: $('#story-container')
+    });
+
+    var storyApp = new StoryView();
+
 });
