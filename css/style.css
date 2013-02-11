@@ -48,5 +48,6 @@ a:hover{
 }
 
 #options a{
+    cursor: pointer;
 	display: none;
 }

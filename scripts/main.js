@@ -40,30 +40,30 @@ require(['jquery','underscore','Backbone','jquerytypewriter'], function($, _, Ba
 
     //view
     var OptionView = Backbone.View.extend({
-        el : "li",
+        tagName : "li",
 
         events: {
-            "click" : "followLink",
+            "click a" : "followLink",
         },
 
         initialize: function(){
-            // this.listenTo(this.model, 'destroy', this.remove);
+            this.listenTo(this.model, 'destroy', this.remove);
         },
 
         render: function(){
-            this.el = "<li><a>" + this.model.get("text") + "</a></li>";
+            this.$el.html("<a>" + this.model.get("text") + "</a>");
             return this.el;
         },
 
         followLink: function(){
+            console.log("click caught");
             this.model.followLink();
         }
     });
 
     //collection
-    var Options = Backbone.Collection.extend({
-        model: Option
-    });
+    var Options = Backbone.Collection.extend({model: Option});
+    var options = new Options();
 
 
     //--- Page ---//
@@ -74,8 +74,10 @@ require(['jquery','underscore','Backbone','jquerytypewriter'], function($, _, Ba
             var optionObjects = this.get("options");
             var optionModels = [];
 
-            for(var i = 0; i < optionObjects.length; i ++){
-                optionModels.push(new Option(optionObjects[i]));
+            if (optionObjects){
+                for(var i = 0; i < optionObjects.length; i ++){
+                    optionModels.push(new Option(optionObjects[i]));
+                }
             }
             return optionModels; 
         }
@@ -115,10 +117,8 @@ require(['jquery','underscore','Backbone','jquerytypewriter'], function($, _, Ba
 
         initialize: function(){
             this.firstPage = true;
-            this.model.bind('change', this.buildOptionsList, this)
             this.model.bind('change', this.render, this);
-            this.options = new Options();
-            this.goToPage(1); //render is initiated off of this call            
+            this.render(); //render is initiated off of this call            
         },
 
         render: function(){
@@ -135,53 +135,47 @@ require(['jquery','underscore','Backbone','jquerytypewriter'], function($, _, Ba
 
             //get the models data and set the elements on the page
             var pageText = this.model.get("text");
-            console.log(pageText);
-            this.$el.find('#page p').html(pageText);
+            this.$el.find('#page p').html("").html(pageText);
             
             //remove existing options, if any
             this.$el.find("#options ul").html("");
 
-            // console.log("this.options", this.options);
-            this.options.each(function(option){
+            //rebuild the options list
+            this.buildOptionsList();
+            //add each option to the options ul
+            options.each(function(option){
                 this.appendOption(option);
             }, this);
 
 
             //display effects
             $('#page p').typewrite({delay : 10, callback: function(){
-               $('#options h3').typewrite({delay: 20, callback: function(){
                 $('#options a').each(function(){
                     $(this).typewrite({delay: 20});
-                    });
-               }});           
-             }});
+                });
+            }});           
 
-            // this.$el
         },
 
         goToPage: function(num){
-            // this.options.reset(); //empty options collection
-            page = story.get(num);
-            console.log("page = ", page);
-            this.model.set(page); //trigger the change event
-            this.buildOptionsList(this.model.get("options"));
+            page = story.get({"id" : num});
+            this.model.set(page.toJSON()); //trigger the change event by replacing the page
         },
 
-        buildOptionsList: function(options){
+        buildOptionsList: function(){
             //refresh the options collection
-            this.options.each(function(option){
-                option.destroy();
-            }, this);
+            options.reset();
+            newOptions = this.model.getOptionArray();
 
-            this.options.reset();
-
-            this.options.add(this.model.getOptionArray());
-            return this.options;            
+            if(newOptions.length){
+                options.add(newOptions);
+            }
+            return options;            
         },
 
         appendOption: function(option){
             var view = new OptionView({"model" : option});
-            this.$el.find("#options ul").append(view.render());
+            this.$el.find("ul").append(view.render());
         },
 
         printOptions : function(){
@@ -190,7 +184,7 @@ require(['jquery','underscore','Backbone','jquerytypewriter'], function($, _, Ba
             });
         }
     });
-    window.storyApp = new StoryView({model : story.get(1)});
+    window.storyApp = new StoryView({model : story.get({"id" : 1})});
     // var storyApp = new StoryView({model : story.get(1)});
 
 });
