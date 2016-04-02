@@ -48,7 +48,12 @@
 			{
 				"text" : "You died. Belee dat",
 				"id": 4,
-                "options" : []
+                "options" : [
+                	{
+                		"text" : "restart",
+                		"route" : 2
+                	}
+                ]
 			}
 		]
 	}
