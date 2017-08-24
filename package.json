@@ -21,7 +21,6 @@
   },
   "homepage": "https://github.com/thelastbaldwin/text_adventure#readme",
   "dependencies": {
-    "commander": "^2.11.0",
-    "inquirer": "^3.2.2"
+    "vorpal": "^1.12.0"
   }
 }
